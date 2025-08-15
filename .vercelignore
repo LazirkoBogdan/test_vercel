@@ -8,6 +8,11 @@ yarn-error.log*
 dist/
 build/
 
+# Development and build artifacts
+*.log
+*.tsbuildinfo
+.env*
+
 # Development files
 .env.local
 .env.development.local

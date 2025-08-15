@@ -47,24 +47,27 @@ npm run preview
 
 3. **Deploy**: Vercel will automatically build and deploy your app
 
-### Option 2: Manual Deployment
+### Option 2: CLI Deployment
 
-1. **Install Vercel CLI**:
-   ```bash
-   npm i -g vercel
-   ```
+```bash
+# Deploy preview
+npm run deploy:preview
 
-2. **Build the project**:
-   ```bash
-   npm run build
-   ```
+# Deploy to production
+npm run deploy
+```
 
-3. **Deploy**:
-   ```bash
-   vercel --prod
-   ```
+### Option 3: Automated Script
 
-### Option 3: GitHub Actions
+```bash
+# Deploy preview
+./deploy.sh
+
+# Deploy to production
+./deploy.sh --prod
+```
+
+### Option 4: GitHub Actions
 
 Create `.github/workflows/deploy.yml`:
 
@@ -82,7 +85,7 @@ jobs:
         with:
           node-version: '18'
       - run: npm ci
-      - run: npm run build
+      - run: npm run build:vercel
       - uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
@@ -98,6 +101,8 @@ jobs:
 The `vercel.json` file is pre-configured with:
 - **Static build** from `dist` directory
 - **SPA routing** (all routes serve `index.html`)
+- **Asset caching** for optimal performance
+- **Three.js optimization** with proper chunk splitting
 - **Optimized caching** for assets and HTML
 - **Environment variables** for production
 

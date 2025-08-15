@@ -7,11 +7,13 @@
         "dev": "vite",
         "build": "tsc && vite build && npm run copy-assets",
         "build:vercel": "tsc && vite build && npm run copy-assets",
-        "vercel-build": "npm run build",
+        "vercel-build": "npm run build:vercel",
         "copy-assets": "copyfiles -u 1 \"assets/**/*\" dist/assets",
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
-        "start": "vite preview"
+        "start": "vite preview",
+        "deploy": "vercel --prod",
+        "deploy:preview": "vercel"
     },
     "devDependencies": {
         "@types/three": "^0.158.3",
@@ -24,7 +26,8 @@
         "eslint-plugin-react-refresh": "^0.4.3",
         "terser": "^5.43.1",
         "typescript": "^5.0.2",
-        "vite": "^4.4.5"
+        "vite": "^4.4.5",
+        "vercel": "^32.5.0"
     },
     "dependencies": {
         "@tweenjs/tween.js": "^21.0.3",
