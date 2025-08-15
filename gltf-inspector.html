@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLTF Inspector - Detailed Analysis</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .file-section {
+            background: #2a2a2a;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+
+        .file-title {
+            color: #4CAF50;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .loading {
+            background: #FF9800;
+            color: black;
+        }
+
+        .success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .error {
+            background: #F44336;
+            color: white;
+        }
+
+        .object-tree {
+            background: #333;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .object-item {
+            margin: 5px 0;
+            padding: 5px;
+            background: #444;
+            border-radius: 3px;
+        }
+
+        .mesh-info {
+            color: #81C784;
+        }
+
+        .group-info {
+            color: #64B5F6;
+        }
+
+        .material-info {
+            color: #FFB74D;
+        }
+
+        .geometry-info {
+            color: #BA68C8;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .stat-card {
+            background: #444;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔍 GLTF File Inspector</h1>
+        <p>This tool will analyze your GLTF files and show exactly what objects they contain.</p>
+
+        <div class="file-section">
+            <div class="file-title">📁 objects.glb (1.9MB)</div>
+            <div id="objects-status" class="status loading">⏳ Loading...</div>
+            <div id="objects-stats" class="stats" style="display: none;"></div>
+            <div id="objects-tree" class="object-tree" style="display: none;"></div>
+            <button onclick="inspectFile('/assets/gltf/objects.glb', 'objects')">🔍 Inspect objects.glb</button>
+        </div>
+
+        <div class="file-section">
+            <div class="file-title">📁 objects2.glb (581KB)</div>
+            <div id="objects2-status" class="status loading">⏳ Loading...</div>
+            <div id="objects2-stats" class="stats" style="display: none;"></div>
+            <div id="objects2-tree" class="object-tree" style="display: none;"></div>
+            <button onclick="inspectFile('/assets/gltf/objects2.glb', 'objects2')">🔍 Inspect objects2.glb</button>
+        </div>
+
+        <div class="file-section">
+            <div class="file-title">📁 ground.glb (551KB)</div>
+            <div id="ground-status" class="status loading">⏳ Loading...</div>
+            <div id="ground-stats" class="stats" style="display: none;"></div>
+            <div id="ground-tree" class="object-tree" style="display: none;"></div>
+            <button onclick="inspectFile('/assets/gltf/ground.glb', 'ground')">🔍 Inspect ground.glb</button>
+        </div>
+
+        <div class="file-section">
+            <div class="file-title">📁 ground2.glb (216KB)</div>
+            <div id="ground2-status" class="status loading">⏳ Loading...</div>
+            <div id="ground2-stats" class="stats" style="display: none;"></div>
+            <div id="ground2-tree" class="object-tree" style="display: none;"></div>
+            <button onclick="inspectFile('/assets/gltf/ground2.glb', 'ground2')">🔍 Inspect ground2.glb</button>
+        </div>
+
+        <div class="file-section">
+            <div class="file-title">📊 Summary</div>
+            <div id="summary"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+        const loader = new GLTFLoader();
+        const fileResults = {};
+
+        async function inspectFile(path, id) {
+            const statusEl = document.getElementById(`${id}-status`);
+            const statsEl = document.getElementById(`${id}-stats`);
+            const treeEl = document.getElementById(`${id}-tree`);
+
+            statusEl.className = 'status loading';
+            statusEl.innerHTML = '⏳ Loading...';
+
+            try {
+                const gltf = await loadGLTF(path);
+                const analysis = analyzeGLTF(gltf, path);
+
+                fileResults[id] = analysis;
+
+                statusEl.className = 'status success';
+                statusEl.innerHTML = '✅ Loaded Successfully';
+
+                statsEl.style.display = 'grid';
+                statsEl.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-number">${analysis.totalObjects}</div>
+                        <div>Total Objects</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${analysis.meshCount}</div>
+                        <div>Meshes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${analysis.groupCount}</div>
+                        <div>Groups</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${analysis.materialCount}</div>
+                        <div>Materials</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${analysis.geometryCount}</div>
+                        <div>Geometries</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${analysis.animationCount}</div>
+                        <div>Animations</div>
+                    </div>
+                `;
+
+                treeEl.style.display = 'block';
+                treeEl.innerHTML = analysis.objectTree;
+
+                updateSummary();
+
+            } catch (error) {
+                statusEl.className = 'status error';
+                statusEl.innerHTML = `❌ Error: ${error.message}`;
+                console.error(`Failed to load ${path}:`, error);
+            }
+        }
+
+        function loadGLTF(path) {
+            return new Promise((resolve, reject) => {
+                loader.load(
+                    path,
+                    resolve,
+                    (progress) => {
+                        console.log(`Loading ${path}: ${(progress.loaded / progress.total * 100).toFixed(1)}%`);
+                    },
+                    reject
+                );
+            });
+        }
+
+        function analyzeGLTF(gltf, path) {
+            const scene = gltf.scene;
+            let meshCount = 0;
+            let groupCount = 0;
+            let materialCount = 0;
+            let geometryCount = 0;
+            const materials = new Set();
+            const geometries = new Set();
+            const objectTree = [];
+
+            scene.traverse((child, index) => {
+                const objectInfo = {
+                    index,
+                    type: child.type,
+                    name: child.name || 'unnamed',
+                    position: child.position,
+                    scale: child.scale,
+                    rotation: child.rotation,
+                    isMesh: child instanceof THREE.Mesh,
+                    isGroup: child instanceof THREE.Group
+                };
+
+                if (child instanceof THREE.Mesh) {
+                    meshCount++;
+                    objectInfo.mesh = {
+                        geometry: child.geometry.type,
+                        material: child.material ? (Array.isArray(child.material) ? 'Multiple' : child.material.type) : 'None'
+                    };
+
+                    if (child.geometry) {
+                        geometries.add(child.geometry.uuid);
+                        geometryCount = geometries.size;
+                    }
+
+                    if (child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach(mat => materials.add(mat.uuid));
+                        } else {
+                            materials.add(child.material.uuid);
+                        }
+                        materialCount = materials.size;
+                    }
+                } else if (child instanceof THREE.Group) {
+                    groupCount++;
+                }
+
+                objectTree.push(objectInfo);
+            });
+
+            return {
+                path,
+                totalObjects: objectTree.length,
+                meshCount,
+                groupCount,
+                materialCount,
+                geometryCount,
+                animationCount: gltf.animations?.length || 0,
+                objectTree: generateObjectTreeHTML(objectTree),
+                rawData: {
+                    scene: gltf.scene,
+                    animations: gltf.animations,
+                    asset: gltf.asset
+                }
+            };
+        }
+
+        function generateObjectTreeHTML(objects) {
+            return objects.map(obj => {
+                const typeClass = obj.isMesh ? 'mesh-info' : obj.isGroup ? 'group-info' : '';
+                const meshDetails = obj.mesh ? `
+                    <div class="material-info">Material: ${obj.mesh.material}</div>
+                    <div class="geometry-info">Geometry: ${obj.mesh.geometry}</div>
+                ` : '';
+
+                return `
+                    <div class="object-item ${typeClass}">
+                        <strong>${obj.index}: ${obj.type} - ${obj.name}</strong><br>
+                        Position: (${obj.position.x.toFixed(2)}, ${obj.position.y.toFixed(2)}, ${obj.position.z.toFixed(2)})<br>
+                        Scale: (${obj.scale.x.toFixed(2)}, ${obj.scale.y.toFixed(2)}, ${obj.scale.z.toFixed(2)})<br>
+                        ${meshDetails}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateSummary() {
+            const summaryEl = document.getElementById('summary');
+            const totalFiles = Object.keys(fileResults).length;
+            const totalMeshes = Object.values(fileResults).reduce((sum, result) => sum + result.meshCount, 0);
+            const totalGroups = Object.values(fileResults).reduce((sum, result) => sum + result.groupCount, 0);
+
+            summaryEl.innerHTML = `
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number">${totalFiles}</div>
+                        <div>Files Analyzed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${totalMeshes}</div>
+                        <div>Total Meshes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${totalGroups}</div>
+                        <div>Total Groups</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <h3>🔍 Analysis Results:</h3>
+                    <ul>
+                        ${Object.entries(fileResults).map(([id, result]) =>
+                `<li><strong>${id}.glb:</strong> ${result.meshCount} meshes, ${result.groupCount} groups, ${result.materialCount} materials</li>`
+            ).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                inspectFile('/assets/gltf/objects.glb', 'objects');
+                inspectFile('/assets/gltf/objects2.glb', 'objects2');
+                inspectFile('/assets/gltf/ground.glb', 'ground');
+                inspectFile('/assets/gltf/ground2.glb', 'ground2');
+            }, 1000);
+        });
+
+        window.inspectFile = inspectFile;
+    </script>
+</body>
+
+</html>

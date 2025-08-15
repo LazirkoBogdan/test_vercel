@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/assets/icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Garden Design - Playable Ad</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #1a1a1a;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #app {
+            position: relative;
+            width: 1920px;
+            height: 1080px;
+            transform-origin: center center;
+            background: #000;
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .ui-element {
+            pointer-events: auto;
+        }
+
+        #category-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .category-button {
+            display: block;
+            width: 120px;
+            height: 40px;
+            margin: 8px 0;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .category-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .category-button.active {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+        }
+
+        #item-panel {
+            position: absolute;
+            top: 20px;
+            left: 160px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+
+        .item-button {
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            margin: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .item-button:hover {
+            border-color: #4CAF50;
+            transform: scale(1.05);
+        }
+
+        .item-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .custom-icon {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .custom-icon svg {
+            max-width: 100%;
+            max-height: 70%;
+            border-radius: 6px;
+        }
+
+        .item-button .label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-size: 10px;
+            text-align: center;
+            padding: 4px;
+            border-radius: 0 0 6px 6px;
+        }
+
+        #gnome-counter {
+            position: absolute;
+            bottom: 35%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(103, 58, 183, 0.9);
+            border-radius: 12px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(103, 58, 183, 0.3);
+            color: white;
+            text-align: center;
+            font-size: 14px;
+            max-width: 300px;
+            box-shadow: 0 4px 15px rgba(103, 58, 183, 0.4);
+        }
+
+        #gnome-counter h3 {
+            margin-bottom: 8px;
+            color: #FFD700;
+            font-size: 16px;
+        }
+
+        #gnome-counter p {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        #gnomes-found {
+            color: #4CAF50;
+            font-size: 16px;
+        }
+
+        #total-gnomes {
+            color: #FFD700;
+            font-size: 16px;
+        }
+
+        #instructions {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            font-size: 14px;
+            max-width: 400px;
+        }
+
+        #instructions h3 {
+            margin-bottom: 8px;
+            color: #4CAF50;
+        }
+
+        .key {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        @media (max-width: 1920px) {
+            #app {
+                transform: scale(calc(100vw / 1920));
+            }
+        }
+
+        @media (max-height: 1080px) {
+            #app {
+                transform: scale(calc(100vh / 1080));
+            }
+        }
+
+        .day-night-button {
+            background: rgba(255, 193, 7, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .day-night-button:hover {
+            background: rgba(255, 193, 7, 1.0);
+            transform: scale(1.05);
+        }
+
+        .day-night-button.night {
+            background: rgba(103, 58, 183, 0.9);
+            border-color: rgba(103, 58, 183, 0.3);
+        }
+
+        .day-night-button.night:hover {
+            background: rgba(103, 58, 183, 1.0);
+        }
+
+        .music-button {
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .music-button:hover {
+            background: rgba(76, 175, 80, 1.0);
+            transform: scale(1.05);
+        }
+
+        .music-button.playing {
+            background: rgba(244, 67, 54, 0.9);
+            border-color: rgba(244, 67, 54, 0.3);
+        }
+
+        .music-button.playing:hover {
+            background: rgba(244, 67, 54, 1.0);
+        }
+
+
+
+        .center-panel {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="canvas-container"></div>
+        <div id="ui-overlay">
+            <div id="category-panel" class="ui-element">
+                <button class="category-button" data-category="plants">Plants</button>
+                <button class="category-button" data-category="models">Models</button>
+            </div>
+
+            <div id="item-panel" class="ui-element">
+            </div>
+
+            <div id="gnome-counter" class="ui-element">
+                <h3>🧙‍♂️ Gnome Hunt</h3>
+                <p>Gnomes found: <span id="gnomes-found">0</span> / <span id="total-gnomes">8</span></p>
+            </div>
+
+            <div id="instructions" class="ui-element">
+                <h3>Garden Designer</h3>
+                <p>Choose a category, then click items to place them in your garden.</p>
+                <p><span class="key">Click</span> on item to select • <span class="key">Click</span> on garden to place</p>
+                <p><span class="key">Right Click</span> or <span class="key">ESC</span> to cancel • <span class="key">Drag</span> to move • <span class="key">Delete</span> to remove</p>
+            </div>
+            <div id="debug-panel" class="ui-element" style="display: none;">
+                <button id="debug-console-btn" class="debug-button">🔍 Debug Console</button>
+            </div>
+            <div id="day-night-panel" class="ui-element center-panel">
+                <button id="day-night-toggle" class="day-night-button">🌅 Day Mode</button>
+                <button id="music-toggle" class="music-button">🎵 Play Music</button>
+
+            </div>
+        </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
