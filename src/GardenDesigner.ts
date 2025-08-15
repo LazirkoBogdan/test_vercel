@@ -95,12 +95,7 @@ export class GardenDesigner {
   }
 
   private initializeCamera(): void {
-    this.camera = new THREE.PerspectiveCamera(
-      60,
-      1920 / 1080,
-      0.1,
-      1000
-    );
+    this.camera = new THREE.PerspectiveCamera(60, 1920 / 1080, 0.1, 1000);
     this.camera.position.set(30, 25, 30);
     this.camera.lookAt(0, 0, 0);
   }
@@ -129,7 +124,6 @@ export class GardenDesigner {
 
     const renderPass = new RenderPass(this.scene, this.camera);
     this.composer.addPass(renderPass);
-
 
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(1920, 1080),
@@ -189,7 +183,6 @@ export class GardenDesigner {
 
     this.createSurroundingElements();
   }
-
 
   private showLoadingStatus(): void {
     const statusDiv = document.createElement("div");
@@ -325,7 +318,6 @@ export class GardenDesigner {
     setTimeout(() => {
       this.assetManager.debugLoadedModels();
       this.addPrePlacedGardenItems();
-
     }, 3000);
   }
 
@@ -389,7 +381,12 @@ export class GardenDesigner {
     this.createWalkingGnome(15, 0, -11, -Math.PI / 2, 31.5, Math.PI, 0.001);
   }
 
-  private createProceduralTree(x: number, _y: number, z: number, rotationY: number = 0): void {
+  private createProceduralTree(
+    x: number,
+    _y: number,
+    z: number,
+    rotationY: number = 0
+  ): void {
     const trunkMaterial = new THREE.MeshStandardMaterial({
       color: 0x8b4513,
       roughness: 0.9,
@@ -426,7 +423,12 @@ export class GardenDesigner {
     treeGroup.add(leaves);
   }
 
-  private createProceduralBench(x: number, _y: number, z: number, rotationY: number = 0): void {
+  private createProceduralBench(
+    x: number,
+    _y: number,
+    z: number,
+    rotationY: number = 0
+  ): void {
     const woodMaterial = new THREE.MeshStandardMaterial({
       color: 0x8b4513,
       roughness: 0.8,
@@ -463,7 +465,8 @@ export class GardenDesigner {
     benchGroup.add(back);
 
     const legPositions = [
-      [-1, 0.325, 0], [1, 0.325, 0]
+      [-1, 0.325, 0],
+      [1, 0.325, 0],
     ];
 
     legPositions.forEach((pos) => {
@@ -478,7 +481,12 @@ export class GardenDesigner {
     });
   }
 
-  private createProceduralLightpole(x: number, _y: number, z: number, rotationY: number = 0): void {
+  private createProceduralLightpole(
+    x: number,
+    _y: number,
+    z: number,
+    rotationY: number = 0
+  ): void {
     const poleMaterial = new THREE.MeshStandardMaterial({
       color: 0x696969,
       roughness: 0.7,
@@ -545,7 +553,10 @@ export class GardenDesigner {
     let bulbMaterial: THREE.MeshStandardMaterial | null = null;
 
     lightpoleGroup.traverse((child: THREE.Object3D) => {
-      if (child instanceof THREE.Mesh && child.geometry instanceof THREE.SphereGeometry) {
+      if (
+        child instanceof THREE.Mesh &&
+        child.geometry instanceof THREE.SphereGeometry
+      ) {
         bulbMesh = child;
         if (child.material instanceof THREE.MeshStandardMaterial) {
           bulbMaterial = child.material;
@@ -573,23 +584,33 @@ export class GardenDesigner {
         const currentMode = this.dayNightSystem.getCurrentMode();
         if (currentMode === "night") {
           (bulbMaterial as THREE.MeshStandardMaterial).color.setHex(0xffffaa);
-          (bulbMaterial as THREE.MeshStandardMaterial).emissive.setHex(0xffffaa);
+          (bulbMaterial as THREE.MeshStandardMaterial).emissive.setHex(
+            0xffffaa
+          );
           (bulbMaterial as THREE.MeshStandardMaterial).emissiveIntensity = 0.8;
           light.intensity = 1.5;
         } else {
           (bulbMaterial as THREE.MeshStandardMaterial).color.setHex(0xcccccc);
-          (bulbMaterial as THREE.MeshStandardMaterial).emissive.setHex(0x000000);
+          (bulbMaterial as THREE.MeshStandardMaterial).emissive.setHex(
+            0x000000
+          );
           (bulbMaterial as THREE.MeshStandardMaterial).emissiveIntensity = 0.0;
           light.intensity = 0;
         }
       }
-
     } else {
-      console.warn("⚠️ Could not find bulb mesh or material in pre-placed lightpole");
+      console.warn(
+        "⚠️ Could not find bulb mesh or material in pre-placed lightpole"
+      );
     }
   }
 
-  private createProceduralFlowerPot(x: number, _y: number, z: number, rotationY: number = 0): void {
+  private createProceduralFlowerPot(
+    x: number,
+    _y: number,
+    z: number,
+    rotationY: number = 0
+  ): void {
     const potMaterial = new THREE.MeshStandardMaterial({
       color: 0xcd853f,
       roughness: 0.8,
@@ -652,15 +673,24 @@ export class GardenDesigner {
 
     const flowerColors = [0xff1493, 0xff69b4, 0xffb6c1, 0xffc0cb, 0xdb7093];
     flowerPotGroup.children.forEach((child, index) => {
-      if (child instanceof THREE.Mesh && child.geometry instanceof THREE.SphereGeometry && index > 1) {
+      if (
+        child instanceof THREE.Mesh &&
+        child.geometry instanceof THREE.SphereGeometry &&
+        index > 1
+      ) {
         const material = child.material as THREE.MeshStandardMaterial;
         material.color.setHex(flowerColors[index - 2]);
       }
     });
-
   }
 
-  private createProceduralStonePath(x: number, _y: number, z: number, rotationY: number = 0, stoneCount: number = 6): void {
+  private createProceduralStonePath(
+    x: number,
+    _y: number,
+    z: number,
+    rotationY: number = 0,
+    stoneCount: number = 6
+  ): void {
     const stoneMaterial = new THREE.MeshStandardMaterial({
       color: 0x8b8b8b,
       roughness: 0.9,
@@ -699,10 +729,14 @@ export class GardenDesigner {
     }
 
     // Removed decorative stones for cleaner appearance
-
   }
 
-  private createProceduralHouse(x: number, y: number, z: number, rotationY: number = 0): void {
+  private createProceduralHouse(
+    x: number,
+    y: number,
+    z: number,
+    rotationY: number = 0
+  ): void {
     const loader = new GLTFLoader();
     loader.load(
       "/assets/gltf/cottage.glb",
@@ -775,15 +809,20 @@ export class GardenDesigner {
         if (this.dragAndDropManager) {
           this.dragAndDropManager.updatePlacedItems(this.placedItems);
         }
-
       },
       undefined,
       (err) => console.error("❌ Failed to load cottage.glb:", err)
     );
   }
 
-  private createProceduralGnome(x: number, y: number, z: number, rotationX: number = 0, rotationY: number = 0, rotationZ: number = 0): void {
-
+  private createProceduralGnome(
+    x: number,
+    y: number,
+    z: number,
+    rotationX: number = 0,
+    rotationY: number = 0,
+    rotationZ: number = 0
+  ): void {
     // Load the gnome GLTF model
     const loader = new GLTFLoader();
     loader.load(
@@ -829,7 +868,7 @@ export class GardenDesigner {
 
         // Add special property to make gnomes disappear when clicked
         mesh.userData.isGnome = true;
-        
+
         mesh.userData.onSelect = () => {
           (mesh as any).isSelected = true;
         };
@@ -861,14 +900,21 @@ export class GardenDesigner {
         if (this.dragAndDropManager) {
           this.dragAndDropManager.updatePlacedItems(this.placedItems);
         }
-
       },
       undefined,
       (err) => console.error("❌ Failed to load gnome.glb:", err)
     );
   }
 
-  private createWalkingGnome(x: number, y: number, z: number, rotationY: number = 0, walkDistance: number = 8, pathRotation: number = 0, walkSpeed: number = 0.00045): void {
+  private createWalkingGnome(
+    x: number,
+    y: number,
+    z: number,
+    rotationY: number = 0,
+    walkDistance: number = 8,
+    pathRotation: number = 0,
+    walkSpeed: number = 0.00045
+  ): void {
     const loader = new GLTFLoader();
     loader.load(
       "/assets/gltf/gnome.glb",
@@ -956,7 +1002,8 @@ export class GardenDesigner {
             mesh.rotation.y = rotationY;
           }
 
-          const rotatedX = startX + (currentX - startX) * Math.cos(pathRotation);
+          const rotatedX =
+            startX + (currentX - startX) * Math.cos(pathRotation);
           const rotatedZ = z + (currentX - startX) * Math.sin(pathRotation);
           mesh.position.x = rotatedX;
           mesh.position.z = rotatedZ;
@@ -964,7 +1011,9 @@ export class GardenDesigner {
           const bobHeight = 0.1;
           const bobSpeed = 8;
           const walkProgress = (currentX - startX) / walkDistance;
-          mesh.position.y = y + Math.abs(Math.sin(walkProgress * Math.PI * bobSpeed)) * bobHeight;
+          mesh.position.y =
+            y +
+            Math.abs(Math.sin(walkProgress * Math.PI * bobSpeed)) * bobHeight;
 
           requestAnimationFrame(walkAnimation);
         };
@@ -985,15 +1034,29 @@ export class GardenDesigner {
 
   private updateLightpoleBulb(): void {
     // Update the pre-placed lightpole
-    if (this.lightpoleBulb && this.lightpoleBulbMaterial && this.lightpoleLight && this.dayNightSystem) {
-      this.dayNightSystem.updateLightpoleBulb(this.lightpoleBulb, this.lightpoleBulbMaterial, this.lightpoleLight);
+    if (
+      this.lightpoleBulb &&
+      this.lightpoleBulbMaterial &&
+      this.lightpoleLight &&
+      this.dayNightSystem
+    ) {
+      this.dayNightSystem.updateLightpoleBulb(
+        this.lightpoleBulb,
+        this.lightpoleBulbMaterial,
+        this.lightpoleLight
+      );
     }
 
     // Update all pre-placed lightpoles in the scene
     this.scene.traverse((child) => {
-      if (child instanceof THREE.Group && child.userData.isLightpole &&
-        child.userData.lightpoleBulb && child.userData.lightpoleBulbMaterial &&
-        child.userData.lightpoleLight && this.dayNightSystem) {
+      if (
+        child instanceof THREE.Group &&
+        child.userData.isLightpole &&
+        child.userData.lightpoleBulb &&
+        child.userData.lightpoleBulbMaterial &&
+        child.userData.lightpoleLight &&
+        this.dayNightSystem
+      ) {
         this.dayNightSystem.updateLightpoleBulb(
           child.userData.lightpoleBulb,
           child.userData.lightpoleBulbMaterial,
@@ -1004,8 +1067,13 @@ export class GardenDesigner {
 
     // Update all user-placed lightpoles
     this.placedItems.forEach((item) => {
-      if (item.type === "lightpole" && item.mesh.userData.lightpoleBulb &&
-        item.mesh.userData.lightpoleBulbMaterial && item.mesh.userData.lightpoleLight && this.dayNightSystem) {
+      if (
+        item.type === "lightpole" &&
+        item.mesh.userData.lightpoleBulb &&
+        item.mesh.userData.lightpoleBulbMaterial &&
+        item.mesh.userData.lightpoleLight &&
+        this.dayNightSystem
+      ) {
         this.dayNightSystem.updateLightpoleBulb(
           item.mesh.userData.lightpoleBulb,
           item.mesh.userData.lightpoleBulbMaterial,
@@ -1022,7 +1090,10 @@ export class GardenDesigner {
     if (lightpoleItem.mesh.userData.group) {
       const group = lightpoleItem.mesh.userData.group;
       group.traverse((child: THREE.Object3D) => {
-        if (child instanceof THREE.Mesh && child.geometry instanceof THREE.SphereGeometry) {
+        if (
+          child instanceof THREE.Mesh &&
+          child.geometry instanceof THREE.SphereGeometry
+        ) {
           bulbMesh = child;
           if (child.material instanceof THREE.MeshStandardMaterial) {
             bulbMaterial = child.material;
@@ -1051,23 +1122,28 @@ export class GardenDesigner {
         const currentMode = this.dayNightSystem.getCurrentMode();
         if (currentMode === "night") {
           (bulbMaterial as THREE.MeshStandardMaterial).color.setHex(0xffffaa);
-          (bulbMaterial as THREE.MeshStandardMaterial).emissive.setHex(0xffffaa);
+          (bulbMaterial as THREE.MeshStandardMaterial).emissive.setHex(
+            0xffffaa
+          );
           (bulbMaterial as THREE.MeshStandardMaterial).emissiveIntensity = 0.8;
           light.intensity = 1.5;
         } else {
           (bulbMaterial as THREE.MeshStandardMaterial).color.setHex(0xcccccc);
-          (bulbMaterial as THREE.MeshStandardMaterial).emissive.setHex(0x000000);
+          (bulbMaterial as THREE.MeshStandardMaterial).emissive.setHex(
+            0x000000
+          );
           (bulbMaterial as THREE.MeshStandardMaterial).emissiveIntensity = 0.0;
           light.intensity = 0;
         }
       }
     } else {
-      console.warn("⚠️ Could not find bulb mesh or material in placed lightpole");
+      console.warn(
+        "⚠️ Could not find bulb mesh or material in placed lightpole"
+      );
     }
   }
 
-  private tryLoadGLTFModels(): void {
-  }
+  private tryLoadGLTFModels(): void {}
 
   private initializeUI(): void {
     this.uiManager = new UIManager();
@@ -1133,6 +1209,8 @@ export class GardenDesigner {
     window.addEventListener("resize", () => {
       this.onWindowResize();
     });
+
+    this.onWindowResize();
   }
 
   private onMouseMove(event: MouseEvent): void {
@@ -1156,9 +1234,19 @@ export class GardenDesigner {
           group.position.copy(point);
           group.position.y = 0;
 
-          console.log(`🔄 Dragg ing group item - Item pos:`, this.selectedItem.position, `Group pos:`, group.position);
+          console.log(
+            `🔄 Dragg ing group item - Item pos:`,
+            this.selectedItem.position,
+            `Group pos:`,
+            group.position
+          );
         } else {
-          console.log(`🔄 Dragging single mesh item - Item pos:`, this.selectedItem.position, `Mesh pos:`, this.selectedItem.mesh.position);
+          console.log(
+            `🔄 Dragging single mesh item - Item pos:`,
+            this.selectedItem.position,
+            `Mesh pos:`,
+            this.selectedItem.mesh.position
+          );
         }
 
         if (this.selectedItem.selectionRing) {
@@ -1198,13 +1286,19 @@ export class GardenDesigner {
         const newItem = this.assetManager.createItem(this.selectedItemType);
         if (newItem) {
           if (!this.isPositionValid(point)) {
-            console.log(`❌ Position not valid for ${this.selectedItemType} at:`, point);
+            console.log(
+              `❌ Position not valid for ${this.selectedItemType} at:`,
+              point
+            );
             return;
           }
 
           // Check for overlaps
           if (this.wouldOverlap(point, newItem.radius)) {
-            console.log(`❌ Overlap detected for ${this.selectedItemType} at:`, point);
+            console.log(
+              `❌ Overlap detected for ${this.selectedItemType} at:`,
+              point
+            );
             return;
           }
 
@@ -1226,7 +1320,6 @@ export class GardenDesigner {
 
             newItem.mesh.position.copy(point);
             newItem.mesh.position.y = 0;
-
           } else {
             this.scene.add(newItem.mesh);
           }
@@ -1242,7 +1335,6 @@ export class GardenDesigner {
           if (this.dragAndDropManager) {
             this.dragAndDropManager.updatePlacedItems(this.placedItems);
           }
-
         } else {
           console.error(`❌ Failed to create item for placement`);
         }
@@ -1308,7 +1400,7 @@ export class GardenDesigner {
           this.makeGnomeDisappear(clickedItem, clickedMesh);
           return;
         }
-        
+
         if (this.selectedItem === clickedItem) {
           this.deselectItem();
         } else {
@@ -1386,7 +1478,9 @@ export class GardenDesigner {
       const group = item.mesh.userData.group;
       group.traverse((child: THREE.Object3D) => {
         if (child instanceof THREE.Mesh && child.material) {
-          const material = Array.isArray(child.material) ? child.material[0] : child.material;
+          const material = Array.isArray(child.material)
+            ? child.material[0]
+            : child.material;
           if (material instanceof THREE.MeshStandardMaterial) {
             if (!child.userData.originalMaterial) {
               child.userData.originalMaterial = {
@@ -1407,9 +1501,6 @@ export class GardenDesigner {
   }
 
   private removeHighlight(item: GardenItem): void {
-
-
-
     if (item.mesh.material) {
       const material = Array.isArray(item.mesh.material)
         ? item.mesh.material[0]
@@ -1432,7 +1523,6 @@ export class GardenDesigner {
           },
         });
 
-
         material.emissive.copy(item.originalMaterialProps.emissive);
         material.emissiveIntensity =
           item.originalMaterialProps.emissiveIntensity;
@@ -1453,14 +1543,11 @@ export class GardenDesigner {
           hasOriginalProps: !!item.originalMaterialProps,
         });
 
-
         this.forceResetMaterial(item);
       }
     }
 
-
     if (item.uniqueMaterial && item.originalMaterialProps) {
-
       const originalItem = this.assetManager.createItem(item.type);
       if (originalItem && originalItem.mesh.material) {
         const originalMaterial = Array.isArray(originalItem.mesh.material)
@@ -1476,12 +1563,9 @@ export class GardenDesigner {
       }
     }
 
-
     this.removeSelectionRing(item);
 
-
     this.stopPulseAnimation(item);
-
 
     this.removeSelectionText(item);
 
@@ -1489,12 +1573,19 @@ export class GardenDesigner {
     if (item.mesh.userData.group) {
       const group = item.mesh.userData.group;
       group.traverse((child: THREE.Object3D) => {
-        if (child instanceof THREE.Mesh && child.material && child.userData.originalMaterial) {
-          const material = Array.isArray(child.material) ? child.material[0] : child.material;
+        if (
+          child instanceof THREE.Mesh &&
+          child.material &&
+          child.userData.originalMaterial
+        ) {
+          const material = Array.isArray(child.material)
+            ? child.material[0]
+            : child.material;
           if (material instanceof THREE.MeshStandardMaterial) {
             // Restore original material for group meshes
             material.emissive.copy(child.userData.originalMaterial.emissive);
-            material.emissiveIntensity = child.userData.originalMaterial.emissiveIntensity;
+            material.emissiveIntensity =
+              child.userData.originalMaterial.emissiveIntensity;
             material.color.copy(child.userData.originalMaterial.color);
           }
         }
@@ -1506,7 +1597,6 @@ export class GardenDesigner {
   }
 
   private addSelectionRing(item: GardenItem): void {
-
     const ringGeometry = new THREE.RingGeometry(
       item.radius + 0.2,
       item.radius + 0.4,
@@ -1524,7 +1614,6 @@ export class GardenDesigner {
     ring.position.copy(item.position);
     ring.position.y = 0.01;
 
-
     item.selectionRing = ring;
     this.scene.add(ring);
   }
@@ -1537,7 +1626,6 @@ export class GardenDesigner {
   }
 
   private startPulseAnimation(item: GardenItem): void {
-
     const originalScale = item.mesh.scale.clone();
 
     // If this item has a group, animate the group instead of just the mesh
@@ -1597,28 +1685,23 @@ export class GardenDesigner {
   }
 
   private addSelectionText(item: GardenItem): void {
-
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d")!;
     canvas.width = 256;
     canvas.height = 64;
-
 
     context.fillStyle = "#00FF88";
     context.font = "bold 24px Arial";
     context.textAlign = "center";
     context.fillText("DRAG TO MOVE", canvas.width / 2, 40);
 
-
     context.strokeStyle = "#FFFFFF";
     context.lineWidth = 2;
     context.strokeText("DRAG TO MOVE", canvas.width / 2, 40);
 
-
     const texture = new THREE.CanvasTexture(canvas);
     const material = new THREE.SpriteMaterial({ map: texture });
     const sprite = new THREE.Sprite(material);
-
 
     sprite.position.copy(item.position);
 
@@ -1633,7 +1716,6 @@ export class GardenDesigner {
 
     sprite.scale.set(2, 0.5, 1);
 
-
     item.selectionText = sprite;
     this.scene.add(sprite);
   }
@@ -1646,7 +1728,6 @@ export class GardenDesigner {
   }
 
   private forceResetMaterial(item: GardenItem): void {
-
     if (item.mesh.material) {
       const material = Array.isArray(item.mesh.material)
         ? item.mesh.material[0]
@@ -1655,10 +1736,8 @@ export class GardenDesigner {
       if (material instanceof THREE.MeshStandardMaterial) {
         console.log(`🔄 Force resetting material for: ${item.type}`);
 
-
         material.emissive.setHex(0x000000);
         material.emissiveIntensity = 0;
-
 
         if (item.originalMaterialProps) {
           material.color.copy(item.originalMaterialProps.color);
@@ -1667,7 +1746,6 @@ export class GardenDesigner {
         console.log(`✅ Material force reset for: ${item.type}`);
       }
     }
-
 
     if (item.uniqueMaterial && item.originalMaterialProps) {
       const originalItem = this.assetManager.createItem(item.type);
@@ -1689,7 +1767,6 @@ export class GardenDesigner {
   private startDragging(item: GardenItem): void {
     this.isDragging = true;
 
-
     const rect = this.renderer.domElement.getBoundingClientRect();
     const mouseX = ((this.mouse.x + 1) / 2) * rect.width;
     const mouseY = ((1 - this.mouse.y) / 2) * rect.height;
@@ -1703,7 +1780,9 @@ export class GardenDesigner {
   private startPlacingItem(itemType: string): void {
     this.isPlacing = true;
     this.selectedItemType = itemType;
-    console.log(`🎯 Starting placement for ${itemType} - isPlacing: ${this.isPlacing}, selectedType: ${this.selectedItemType}`);
+    console.log(
+      `🎯 Starting placement for ${itemType} - isPlacing: ${this.isPlacing}, selectedType: ${this.selectedItemType}`
+    );
 
     // Clear any previously selected item to remove highlighting
     if (this.selectedItem) {
@@ -1725,26 +1804,43 @@ export class GardenDesigner {
       console.error(`❌ Failed to create item for ${itemType}`);
       this.cancelPlacement();
     } else {
-      console.log(`✅ Preview item created for ${itemType}, ready for placement. State: isPlacing=${this.isPlacing}, selectedType=${this.selectedItemType}`);
+      console.log(
+        `✅ Preview item created for ${itemType}, ready for placement. State: isPlacing=${this.isPlacing}, selectedType=${this.selectedItemType}`
+      );
     }
   }
-
-
 
   private isPositionValid(position: THREE.Vector3): boolean {
     // Special handling for stone paths - allow them to be placed in a wider area
     if (this.selectedItemType === "stone_path") {
       // Allow stone paths to be placed in a wider area, including near edges
       const margin = 2.0; // Reduced margin for paths
-      const isValid = position.x >= -20 + margin && position.x <= 20 - margin &&
-        position.z >= -15 + margin && position.z <= 15 - margin;
-      console.log(`🧱 Stone path position validation:`, position, `Valid:`, isValid);
+      const isValid =
+        position.x >= -20 + margin &&
+        position.x <= 20 - margin &&
+        position.z >= -15 + margin &&
+        position.z <= 15 - margin;
+      console.log(
+        `🧱 Stone path position validation:`,
+        position,
+        `Valid:`,
+        isValid
+      );
       return isValid;
     }
 
     // Standard validation for other items
     const isValid = this.gardenBounds.containsPoint(position);
-    console.log(`📍 Position validation:`, position, `Bounds:`, this.gardenBounds.min, `to`, this.gardenBounds.max, `Valid:`, isValid);
+    console.log(
+      `📍 Position validation:`,
+      position,
+      `Bounds:`,
+      this.gardenBounds.min,
+      `to`,
+      this.gardenBounds.max,
+      `Valid:`,
+      isValid
+    );
     return isValid;
   }
 
@@ -1753,27 +1849,35 @@ export class GardenDesigner {
       if (item === this.selectedItem) continue;
 
       // Special handling for stone paths - allow them to be placed closer together
-      const isStonePath = this.selectedItemType === "stone_path" && item.type === "stone_path";
+      const isStonePath =
+        this.selectedItemType === "stone_path" && item.type === "stone_path";
       const minDistance = isStonePath ? 2.0 : radius + item.radius;
 
       const distance = position.distanceTo(item.position);
       if (distance < minDistance) {
-        console.log(`⚠️ Overlap detected: ${this.selectedItemType} at distance ${distance.toFixed(2)} from ${item.type} (min: ${minDistance.toFixed(2)})`);
+        console.log(
+          `⚠️ Overlap detected: ${
+            this.selectedItemType
+          } at distance ${distance.toFixed(2)} from ${
+            item.type
+          } (min: ${minDistance.toFixed(2)})`
+        );
         return true;
       }
     }
-    console.log(`✅ No overlap detected for ${this.selectedItemType} at:`, position);
+    console.log(
+      `✅ No overlap detected for ${this.selectedItemType} at:`,
+      position
+    );
     return false;
   }
 
   private animateItemSpawn(item: GardenItem): void {
-
     item.mesh.scale.set(0.6, 0.6, 0.6);
 
     const scaleTween = new TWEEN.Tween(item.mesh.scale)
       .to({ x: 1.0, y: 1.0, z: 1.0 }, 500)
       .easing(TWEEN.Easing.Back.Out);
-
 
     const originalY = item.position.y;
     item.position.y = -0.5;
@@ -1782,7 +1886,6 @@ export class GardenDesigner {
       .to({ y: originalY + 0.3 }, 300)
       .easing(TWEEN.Easing.Bounce.Out)
       .onComplete(() => {
-
         new TWEEN.Tween(item.position)
           .to({ y: originalY }, 200)
           .easing(TWEEN.Easing.Quadratic.Out)
@@ -1811,25 +1914,20 @@ export class GardenDesigner {
 
   private deleteSelectedItem(): void {
     if (this.selectedItem) {
-
       this.removeHighlight(this.selectedItem);
 
-
       this.scene.remove(this.selectedItem.mesh);
-
 
       const index = this.placedItems.indexOf(this.selectedItem);
       if (index > -1) {
         this.placedItems.splice(index, 1);
       }
 
-
       if (this.dragAndDropManager) {
         this.dragAndDropManager.updatePlacedItems(this.placedItems);
       }
 
       console.log(`🗑️ Deleted item: ${this.selectedItem.type}`);
-
 
       this.selectedItem = null;
       this.isDragging = false;
@@ -1839,39 +1937,41 @@ export class GardenDesigner {
   private makeGnomeDisappear(item: GardenItem, mesh: THREE.Mesh): void {
     // Play click sound
     this.audioManager.playClick();
-    
+
     // Add a fun disappearing animation
     const targetScale = new THREE.Vector3(0, 0, 0);
-    
+
     // Animate the gnome shrinking and fading away
     const animate = () => {
       mesh.scale.lerp(targetScale, 0.1);
-      
+
       if (mesh.scale.length() > 0.01) {
         requestAnimationFrame(animate);
       } else {
         // Remove the gnome from the scene
         this.scene.remove(mesh);
-        
+
         // Remove from placed items
         const index = this.placedItems.indexOf(item);
         if (index > -1) {
           this.placedItems.splice(index, 1);
         }
-        
+
         // Update drag and drop manager
         if (this.dragAndDropManager) {
           this.dragAndDropManager.updatePlacedItems(this.placedItems);
         }
-        
+
         // Increment found gnomes counter
         this.foundGnomes++;
         this.updateGnomeCounter();
-        
-        console.log(`🧙‍♂️ Gnome disappeared! Found: ${this.foundGnomes}/${this.totalGnomes}`);
+
+        console.log(
+          `🧙‍♂️ Gnome disappeared! Found: ${this.foundGnomes}/${this.totalGnomes}`
+        );
       }
     };
-    
+
     animate();
   }
 
@@ -1882,11 +1982,19 @@ export class GardenDesigner {
   }
 
   private onWindowResize(): void {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    // //@ts-expect-error as aspect is not in the type
+    // camera.aspect = width / height;
+    // //@ts-expect-error  as updateProjectionMatrix is not in the type
+    // camera.updateProjectionMatrix();
+    // renderer.setSize(width, height);
+    // renderer.setPixelRatio(window.devicePixelRatio);
 
-
-    this.camera.aspect = 1920 / 1080;
+    this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(1920, 1080);
+    this.renderer.setSize(width, height);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
   }
 
   private animate(): void {
@@ -1902,10 +2010,8 @@ export class GardenDesigner {
   }
 
   private setupDebugButtons(): void {
-
     const debugPanel = document.getElementById("debug-panel");
     if (debugPanel) {
-
       import("./config/uiConfig").then(({ UI_CONFIG }) => {
         if (UI_CONFIG.debug) {
           debugPanel.style.display = "block";
@@ -1915,7 +2021,6 @@ export class GardenDesigner {
         }
       });
     }
-
 
     this.setupDayNightButton();
   }
@@ -1945,7 +2050,6 @@ export class GardenDesigner {
 
     console.log("🔍 Debug Info:", debugInfo);
 
-
     alert(`Debug Info:\n${JSON.stringify(debugInfo, null, 2)}`);
   }
 
@@ -1967,7 +2071,6 @@ export class GardenDesigner {
     } else {
       console.log("❌ Day/Night toggle button not found in HTML");
     }
-
 
     const musicBtn = document.getElementById("music-toggle");
     if (musicBtn) {
@@ -2017,26 +2120,23 @@ export class GardenDesigner {
   }
 
   public dispose(): void {
-
     if (this.controls) {
       this.controls.dispose();
     }
 
-
     if (this.renderer) {
       this.renderer.dispose();
     }
-
 
     if (this.composer) {
       this.composer.dispose();
     }
   }
 
-
-
   private ensureCleanMaterials(item: GardenItem): void {
-    console.log(`🧹 Ensuring clean materials for newly placed item: ${item.type}`);
+    console.log(
+      `🧹 Ensuring clean materials for newly placed item: ${item.type}`
+    );
 
     // Reset main mesh materials
     if (item.mesh.material) {
@@ -2052,7 +2152,9 @@ export class GardenDesigner {
             emissiveIntensity: material.emissiveIntensity,
             color: material.color.clone(),
           };
-          console.log(`💾 Stored original material props for new item: ${item.type}`);
+          console.log(
+            `💾 Stored original material props for new item: ${item.type}`
+          );
         }
 
         // Ensure no highlighting is applied
@@ -2067,7 +2169,9 @@ export class GardenDesigner {
       const group = item.mesh.userData.group;
       group.traverse((child: THREE.Object3D) => {
         if (child instanceof THREE.Mesh && child.material) {
-          const material = Array.isArray(child.material) ? child.material[0] : child.material;
+          const material = Array.isArray(child.material)
+            ? child.material[0]
+            : child.material;
           if (material instanceof THREE.MeshStandardMaterial) {
             // Store original material if not already stored
             if (!child.userData.originalMaterial) {
